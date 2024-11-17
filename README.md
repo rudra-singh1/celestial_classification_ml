@@ -62,35 +62,107 @@ The dataset contains various features of celestial objects, including:
 4. **Feature Importance Analysis**
    - Using Random Forest to determine key predictive features.
 
-## Visualizations
+## Data Preparation
 
-### Correlation Matrix Heatmap
-Correlation Matrix
-**Description**: This heatmap visualizes the correlations between different features in the dataset. It helps identify which features are strongly correlated, which can inform feature selection and dimensionality reduction.
+### Data Cleaning
 
-### Histograms of Redshift for Each Class
-Redshift Histograms
-**Description**: The histograms display the distribution of redshift values for each class of celestial objects. Stars generally show lower redshift values compared to galaxies and quasars, indicating their proximity.
+The initial step involves reading the dataset into a Pandas DataFrame and performing basic cleaning operations. We drop unnecessary columns such as `objid`, `specobjid`, `run`, `rerun`, `camcol`, and `field`, which do not contribute to our predictive model.
+
+```python
+import pandas as pd
+
+# Load the dataset
+sdss_df = pd.read_csv('Skyserver_SQL2_27_2018_6_51_39_PM.csv', skiprows=1)
+
+# Dropping irrelevant columns
+sdss_df.drop(['objid', 'specobjid', 'run', 'rereun', 'camcol', 'field'], axis=1, inplace=True)
+```
+
+### Correlation Analysis
+
+To understand the relationships between features, we compute the correlation matrix. This helps identify which features are strongly correlated.
+
+#### Correlation Matrix Heatmap
+
+![Correlation Heatmap](https://github.com/rudra-singh1/celestial_classification_ml/blob/main/correlation_heatmap.png)
+
+The correlation matrix heatmap reveals strong relationships between magnitude measurements (u, g, r, i, z), while redshift shows distinct patterns for different celestial objects.
+
+### Distribution of Redshift
+
+Next, we analyze the distribution of redshift values across different classes of celestial objects.
+
+#### Histograms of Redshift for Each Class
+
+![Redshift Distribution](https://github.com/rudra-singh1/celestial_classification_ml/blob/main/redshift.png)
+
+The redshift distributions show distinct patterns: stars typically have lower redshift values, while quasars show the highest redshift values, indicating their vast distances from Earth.
 
 ### Right Ascension vs. Declination Scatter Plot
-RA vs Dec Scatter Plot
-**Description**: The scatter plot of right ascension versus declination reveals spatial distributions of stars, galaxies, and quasars in the celestial sphere. Clear clustering patterns suggest that certain classes occupy distinct regions.
 
-### PCA Explained Variance Plot
-PCA Explained Variance
-**Description**: The PCA explained variance plot indicates how much information is captured by each principal component. The first few components capture a significant portion of the variance.
+We visualize the spatial distribution of celestial objects using right ascension and declination coordinates.
 
-### Confusion Matrix
-Confusion Matrix
-**Description**: The confusion matrix summarizes the performance of our best classifier, illustrating how well it distinguishes between stars, galaxies, and quasars.
+![Right Ascension and Declination](https://github.com/rudra-singh1/celestial_classification_ml/blob/main/ra.png)
 
-### Feature Importance Bar Plot
-Feature Importance
-**Description**: The feature importance bar plot ranks features based on their contribution to model predictions. Redshift emerged as the most significant predictor.
+The spatial distribution of objects across right ascension and declination coordinates reveals the survey's coverage pattern and object clustering.
 
-## Results
+## Dimensionality Reduction with PCA
 
-The project demonstrates the effectiveness of different machine learning algorithms in classifying celestial objects. Key findings include:
+We apply Principal Component Analysis (PCA) to reduce dimensionality while retaining variance in our dataset. After fitting PCA on our feature set (redshift, u, g, r, i, z), we analyze the explained variance ratio to determine how many components to retain.
+
+#### PCA Explained Variance Plot
+
+![PCA Analysis](https://github.com/rudra-singh1/celestial_classification_ml/blob/main/pca.png)
+
+Principal Component Analysis of the five magnitude measurements (u, g, r, i, z) shows that the first two components capture most of the variance in the data.
+
+## Unsupervised Clustering with K-Means
+
+We perform K-Means clustering to explore whether our features are sufficient for classification.
+
+### Preliminary K-Means Results
+
+After implementing K-Means clustering on selected features:
+
+![KMeans Clustering](https://github.com/rudra-singh1/celestial_classification_ml/blob/main/kmeans.png)
+
+K-means clustering analysis reveals natural groupings in the data that largely correspond to the three celestial object classes.
+
+### Optimal Number of Clusters
+
+Using methods such as the Elbow method or Silhouette analysis helps us determine the optimal number of clusters for our K-Means model.
+
+## Supervised Machine Learning Models
+
+We implement several classification algorithms on our cleaned dataset:
+
+1. **K-Nearest Neighbors**
+2. **Naive Bayes**
+3. **Random Forest**
+4. **Support Vector Machine**
+5. **Multi-Layer Perceptron**
+
+Each model is evaluated based on accuracy, precision, recall, and F1-score metrics.
+
+### Confusion Matrix Visualization
+
+![Confusion Matrix](https://github.com/rudra-singh1/celestial_classification_ml/blob/main/confusionmatrix.png)
+
+The confusion matrix demonstrates the classification performance across the three classes, with particularly strong performance in distinguishing stars from other celestial objects.
+
+### Feature Importance Analysis with Random Forest
+
+Using Random Forest allows us to rank features based on their contribution to model predictions.
+
+#### Feature Importance Bar Plot
+
+![Feature Importance](https://github.com/rudra-singh1/celestial_classification_ml/blob/main/featureplot.png)
+
+Random Forest feature importance analysis reveals that redshift is the most significant predictor, followed by magnitude measurements in different wavelength bands.
+
+## Results Summary
+
+The project demonstrates the effectiveness of different machine learning algorithms in classifying celestial objects based on SDSS data. Key findings include:
 
 - Comparison of model performances across different metrics.
 - Insights into the most important features for classification.
@@ -107,15 +179,7 @@ The project demonstrates the effectiveness of different machine learning algorit
 
 Contributions to this project are welcome. Please feel free to submit a Pull Request.
 
-## License
-
-This project is open source and available under the [MIT License](LICENSE).
-
 ## Acknowledgments
 
 - Sloan Digital Sky Survey for providing the dataset.
-- University of Washington eScience Institute for guidance throughout this project.
-
-Citations:
-[1] https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/36324829/8d2b9826-b304-4b63-bcc7-e495857fa99c/paste.txt
-[2] https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/36324829/31bd796d-e2ed-414e-9ea5-2a2052ee8c94/paste-2.txt
+---
